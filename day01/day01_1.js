@@ -11,7 +11,7 @@ const lineReader = require('readline').createInterface({
 const [ left, right ] = [ [], [] ]
 
 lineReader.on('line', line => {
-    const [leftNum, rightNum ] = line.split('   ').map(Number)
+    const [ leftNum, rightNum ] = line.split('   ').map(Number)
     left.push(leftNum)
     right.push(rightNum)
 })
