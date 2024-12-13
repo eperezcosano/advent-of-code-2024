@@ -11,8 +11,6 @@ const lineReader = require('readline').createInterface({
 const word = "XMAS"
 const grid = []
 
-// Too low 2492
-
 function findWordInLine(arr) {
     let count = 0
     const lines = [arr.join(''), arr.reverse().join('')]
@@ -53,14 +51,14 @@ function findDiagonalDesc() {
     let count = 0
     for (let x = 0; x <= grid[0].length - word.length; x++) {
         const arr = []
-        for (let d = 0; d + x < grid[0].length; d++) {
+        for (let d = 0; (d + x) < grid[0].length && d < grid.length; d++) {
             arr.push(grid[d][d + x])
         }
         count += findWordInLine(arr)
     }
     for (let y = 1; y <= grid.length - word.length; y++) {
-        let arr = []
-        for (let d = 0; d + y < grid.length; d++) {
+        const arr = []
+        for (let d = 0; (d + y) < grid.length && d < grid[0].length; d++) {
             arr.push(grid[d + y][d])
         }
         count += findWordInLine(arr)
@@ -72,14 +70,14 @@ function findDiagonalAsc() {
     let count = 0
     for (let x = grid[0].length - 1; x >= word.length - 1; x--) {
         const arr = []
-        for (let d = 0; x - d >= 0; d++) {
+        for (let d = 0; (x - d) >= 0 && d < grid.length; d++) {
             arr.push(grid[d][x - d])
         }
         count += findWordInLine(arr)
     }
     for (let y = 1; y <= grid.length - word.length; y++) {
-        let arr = []
-        for (let d = 0; d + y < grid.length; d++) {
+        const arr = []
+        for (let d = 0; (d + y) < grid.length && (grid[0].length - 1 - d) >= 0; d++) {
             arr.push(grid[d + y][grid[0].length - 1 - d])
         }
         count += findWordInLine(arr)
@@ -90,7 +88,11 @@ function findDiagonalAsc() {
 lineReader.on('line', line => grid.push(line.split('')))
 
 lineReader.on('close', () => {
-    const res = findHorizontal() + findVertical() + findDiagonalDesc() + findDiagonalDesc()
+    const res =
+        findHorizontal() +
+        findVertical() +
+        findDiagonalDesc() +
+        findDiagonalAsc()
     console.log('Result:', res)
-    // Result:
+    // Result: 2521
 })
