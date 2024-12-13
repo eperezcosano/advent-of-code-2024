@@ -11,13 +11,15 @@ const lineReader = require('readline').createInterface({
 const rules = new Map()
 const updates = []
 
+function comparator(a, b) {
+    const vals = rules.get(a)
+    if (vals && vals.includes(b)) return -1
+    return 0
+}
+
 function isCorrectOrder(arr) {
     const tmp = arr.slice()
-    tmp.sort((a, b) => {
-        const vals = rules.get(a)
-        if (vals && vals.includes(b)) return -1
-        return 0
-    })
+    tmp.sort((a, b) => comparator(a, b))
     return arr.every((val, i) => val === tmp[i])
 }
 
@@ -33,7 +35,9 @@ lineReader.on('line', line => {
 })
 
 lineReader.on('close', () => {
-    const res = updates.filter(update => isCorrectOrder(update)).reduce((acc, arr) => acc + arr[Math.floor(arr.length / 2)], 0)
+    const incorrect = updates.filter(update => !isCorrectOrder(update))
+    incorrect.forEach(arr => arr.sort((a, b) => comparator(a, b)))
+    const res = incorrect.reduce((acc, arr) => acc + arr[Math.floor(arr.length / 2)], 0)
     console.log('Result:', res)
-    // Result:
+    // Result: 6336
 })
