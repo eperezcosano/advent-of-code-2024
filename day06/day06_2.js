@@ -17,11 +17,12 @@ function hasLoop(ry, rx) {
     let [cy, cx, fy, fx] = [ccy, ccx, cfy, cfx]
     for (let [y, x] = [cy, cx]; Math.min(y, x) >= 0 && y < grid.length && x < grid[y].length; y += fy, x += fx) {
         if (Math.min(y + fy, x + fx) >= 0 && (y + fy) < grid.length && (x + fx) < grid[0].length && ((y + fy === ry && x + fx === rx) || grid[y + fy][x + fx] === '#')) {
-            if (turns.has([y, x, fy, fx].join())) return true
-            turns.add([y, x, fy, fx].join())
+
             let ty = fy
             fy = fx
             fx = -ty
+            if (turns.has([y, x, fy, fx].join())) return true
+            turns.add([y, x, fy, fx].join())
         }
     }
     return false
