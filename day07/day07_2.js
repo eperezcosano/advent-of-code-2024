@@ -5,20 +5,25 @@
 * */
 
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./test.txt')
+    input: require('fs').createReadStream('./day07.txt')
 })
 
 const equations = []
 
 function evaluate({ res, nums }) {
-    const combinations = 2 ** (nums.length - 1)
-    const maxBits = (combinations - 1).toString(2).length
-    for (let i = 0; i < combinations; i++) {
-        const bits = i.toString(2).padStart(maxBits, '0')
+    for (let i = 0; i < 3 ** (nums.length - 1); i++) {
+        let pattern = i
+        const mask = []
+        for (let j = 0; j < nums.length - 1; j++) {
+            mask.unshift(pattern % 3)
+            pattern = Math.floor(pattern / 3)
+        }
         let total = nums[0]
-        for (let j = 0; j < maxBits; j++) {
+        for (let j = 0; j < nums.length - 1; j++) {
             const nextNum = nums[j + 1]
-            bits[j] === '0' ? total += nextNum : total *= nextNum
+            if (mask[j] === 0) total += nextNum
+            else if (mask[j] === 1) total *= nextNum
+            else if (mask[j] === 2) total = parseInt(`${total}${nextNum}`)
         }
         if (total === res) return res
     }
@@ -33,5 +38,5 @@ lineReader.on('line', line => {
 lineReader.on('close', () => {
     const res = equations.reduce((acc, eq) => acc + evaluate(eq), 0)
     console.log('Result:', res)
-    // Result:
+    // Result: 492383931650959
 })
