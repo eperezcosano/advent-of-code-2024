@@ -9,20 +9,17 @@ const lineReader = require('readline').createInterface({
 })
 
 const grid = []
-let [ccy, ccx] = [0, 0]
-let [cfy, cfx] = [-1, 0]
+let [sy, sx] = [0, 0]
 
-function hasLoop(ry, rx) {
+function hasLoop(oy, ox) {
     const turns = new Set()
-    let [cy, cx, fy, fx] = [ccy, ccx, cfy, cfx]
-    for (let [y, x] = [cy, cx]; Math.min(y, x) >= 0 && y < grid.length && x < grid[y].length; y += fy, x += fx) {
-        if (Math.min(y + fy, x + fx) >= 0 && (y + fy) < grid.length && (x + fx) < grid[0].length && ((y + fy === ry && x + fx === rx) || grid[y + fy][x + fx] === '#')) {
-
+    for (let [y, x, fy, fx] = [sy, sx, -1, 0]; Math.min(y, x) >= 0 && y < grid.length && x < grid[y].length; y += fy, x += fx) {
+        while (Math.min(y + fy, x + fx) >= 0 && (y + fy) < grid.length && (x + fx) < grid[0].length && (grid[y + fy][x + fx] === '#' || (y + fy === oy && x + fx === ox))) {
+            if (turns.has([y, x, fy, fx].join())) return true
+            turns.add([y, x, fy, fx].join())
             let ty = fy
             fy = fx
             fx = -ty
-            if (turns.has([y, x, fy, fx].join())) return true
-            turns.add([y, x, fy, fx].join())
         }
     }
     return false
@@ -41,8 +38,8 @@ function runPossibilities() {
 
 lineReader.on('line', line => {
     if (line.includes('^')) {
-        ccy = grid.length
-        ccx = line.indexOf('^')
+        sy = grid.length
+        sx = line.indexOf('^')
     }
     grid.push(line.split(''))
 })
@@ -50,6 +47,5 @@ lineReader.on('line', line => {
 lineReader.on('close', () => {
     const res = runPossibilities()
     console.log('Result:', res)
-    // Result:
+    // Result: 1753
 })
-//too high 1825
