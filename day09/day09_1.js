@@ -11,22 +11,21 @@ const lineReader = require('readline').createInterface({
 let disk
 
 function compactBlocks(blocks) {
-    while (blocks.includes('.')) {
-        while (blocks[blocks.length - 1] === '.') blocks.pop()
-        const i = blocks.findIndex(elem => elem === '.')
+    for (let i = blocks.findIndex(elem => isNaN(elem)); i >= 0; i = blocks.findIndex(elem => isNaN(elem))) {
+        while (isNaN(blocks[blocks.length - 1])) blocks.pop()
         blocks[i] = blocks.pop()
     }
-    return blocks.map(Number)
+    return blocks
 }
 
 function computeBlocks() {
-    let blocks = ""
+    const blocks = []
     for (let i = 0, id = 0; i < disk.length; i++) {
         const n = parseInt(disk[i])
-        const s = (i % 2 === 0) ? `${id++}` : '.'
-        blocks += s.repeat(n)
+        const s = (i % 2 === 0) ? id++ : NaN
+        blocks.push(...Array(n).fill(s))
     }
-    return blocks.split('')
+    return blocks
 }
 
 lineReader.on('line', line => disk = line)
@@ -36,6 +35,5 @@ lineReader.on('close', () => {
     const compact = compactBlocks(blocks)
     const res = compact.reduce((acc, num, i) => acc + i * num, 0)
     console.log('Result', res)
-    // Result:
+    // Result: 6307275788409
 })
-// too low 89425419840
