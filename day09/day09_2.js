@@ -8,39 +8,34 @@ const lineReader = require('readline').createInterface({
     input: require('fs').createReadStream('./day09.txt')
 })
 
-let disk
+const files = []
+let blanks = []
 
-function compactBlocks(blocks) {
-    let i, a
-    while (blocks.includes(NaN)) {
-        while (isNaN(blocks[blocks.length - 1])) blocks.pop()
-        i = blocks.findIndex(elem => isNaN(elem))
-        //a = blocks.findLastIndex(elem => !isNaN(elem))
-        //if (i === -1 || a < i) break
-        //blocks[i] = blocks[a]
-        blocks[i] = blocks.pop()
-        //blocks[a] = NaN
+lineReader.on('line', line => {
+    for (let i = 0, length = 0, from = 0; i < line.length; i++, from += length) {
+        length = parseInt(line[i])
+        if (i % 2 === 0) {
+            files.push([from, length])
+        } else {
+            if (length !== 0) blanks.push([from, length])
+        }
     }
-    //if (i !== -1) blocks = blocks.slice(0, i)
-    return blocks
-}
-
-function computeBlocks() {
-    const blocks = []
-    for (let i = 0, id = 0; i < disk.length; i++) {
-        const n = parseInt(disk[i])
-        const s = (i % 2 === 0) ? id++ : NaN
-        blocks.push(...Array(n).fill(s))
-    }
-    return blocks
-}
-
-lineReader.on('line', line => disk = line)
+})
 
 lineReader.on('close', () => {
-    const blocks = computeBlocks()
-    const compact = compactBlocks(blocks)
-    const res = compact.reduce((acc, num, i) => acc + i * num, 0)
+    for (let id = files.length - 1; id >= 0; id--) {
+        const [fileStart, fileLength] = files[id]
+        for (let i = 0; i < blanks.length; i++) {
+            const [blankStart, blankLength] = blanks[i]
+            if (blankStart >= fileStart) break
+            if (blankLength < fileLength) continue
+            files[id] = [blankStart, fileLength]
+            if (fileLength === blankLength) blanks = blanks.filter(blank => blank !== blanks[i])
+            else blanks[i] = [blankStart + fileLength, blankLength - fileLength]
+            break
+        }
+    }
+    const res = files.reduce((acc, [x, y], i) => acc + i * y * (x + (y - 1) / 2), 0)
     console.log('Result', res)
-    // Result:
+    // Result: 6327174563252
 })
